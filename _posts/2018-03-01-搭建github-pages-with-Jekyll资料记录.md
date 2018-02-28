@@ -1,15 +1,15 @@
+---
 layout: post
-title:  "搭建github pages with Jekyll资料记录"
-date:   2018-03-01 1:22:03 +0800
+title:  "Welcome to Jekyll!"
+date:   2018-02-26 20:55:03 +0800
 categories: jekyll update
-
-
+---
 
 之前都在博客园记录，但是实在太丑了，所以想搭出一个简约的个人博客。现在的样子是根据教程搭出来的，模板算是jeklly自带的，没有采用直接fork别人仓库的方式~~
 
 由于对前端实在不熟悉，现在就先放在这，慢慢学着然后再改样子。
 
-#####第一步当然是进入github pages主页，有很明确的流程指导
+**第一步当然是进入github pages主页，有很明确的流程指导**
 
 在查找资料过程中，以下三篇教程基本解决了遇到的大部分问题：
 
