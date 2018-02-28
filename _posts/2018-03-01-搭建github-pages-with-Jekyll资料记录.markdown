@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
-date:   2018-02-26 20:55:03 +0800
+title:  "搭建github-pages-with-Jekyll资料记录"
+date:   2018-03-01 1:09:03 +0800
 categories: jekyll update
 ---
 
