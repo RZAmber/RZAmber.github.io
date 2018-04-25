@@ -1,0 +1,105 @@
+# Mac通过ssh远程登录服务器（密钥对方式，效果同windows下putty+Winscp）
+
+> 背景介绍：使用来连接华为云的MapReduce服务，但是只有windows下教程。而且本人对linux不熟悉，所以折腾好久才登录上。
+>
+> 提示：在华为云开服务过程中会下载下来一个密钥文件KeyPair.pem，这是后面要用到的。
+>
+> MAC终端是支持使用pem密钥文件的，但是windows下好像是要用putty转成ppk格式（这一句还没有验证，无法保证正确性）。
+
+### 介绍mac ITerm下远程登录ECS(Elastic Compute Service)
+
+#### 第一步
+
+Mac的系统默认自带了ssh服务，但是一般情况下Mac的ssh服务关闭，所以首先打开来：
+
+System preference ——> sharing ——> 勾选Remote Login
+
+#### 第二步：查看ssh文件目录
+
+打开ITerm，执行：
+
+`ls ~/.ssh`
+
+查看文件内容，如果没有密钥id_rsa和id_rsa.pub(分别表示私钥和公钥)这两个文件，建议先生成：
+
+`ssh-keygen -t rsa`
+
+连续三个回车就可以了，默认保存在~/.ssh下。
+
+#### 第三步：连接远端服务器
+
+1. 将下载下来的密钥对移到~/.ssh目录下
+
+   `mv ~/desktop/KeyPair.pem ~/.ssh/KeyPair.pem`
+
+2. 限制私有ssh密钥权限，使用chmod命令来确保此文件不是公开可见的
+
+   `chmod 400 ~/.ssh/KeyPair.pem`
+
+3. 通过密钥连接服务器
+
+   执行以下命令：
+
+   `ssh -i ~/.ssh/KepPair.pem root@114.23.4.125`
+
+   下面可能更清楚点：
+
+   `ssh -i .pem文件的完整路径 用户名@IP地址 `
+
+   也可以执行：
+
+   `ssh -v -i ~/.ssh/KepPair.pem root@114.23.4.125`
+
+   这个时候会显示整个连接的流程，方便自己判断下哪里出错了。
+
+   然后你会看到一堆话，会问一句：
+
+   `Are you sure you want to continue connecting(yes/no)?`
+
+   输入yes就好了。
+
+   如果显示![Screen Shot 2018-04-25 at 9.16.41 PM.png](https://i.loli.net/2018/04/25/5ae09297898c5.png)那么恭喜你，连接成功了。不过大部分时候都会出点错误，下面介绍常见的两种错误和处理方式。
+
+###第四步：错误介绍
+
+1. 如果出现如下错误，说明pem文件权限太大，需要设置权限。
+
+   `Permissions 0644 for 'KeyPair.pem' are too open`
+
+   设置方法：
+
+   `sudo chmod 0600 KeyPair.pem`
+
+2. 如果出现`Permission denied(publickey).`，这个说明服务器拒绝连接，但是造成原因非常多，网上的解决方法也很多，我列举几种：
+
+   * ~/.ssh文件中缺少id_rsa文件，这个按照第二步解决就可以了
+   * 检查用户名有没有写错，比如我一直在`root@IP add`，但是发现云给的用户名为linux，修改之后就连接成功了。据网上资料显示，连接AWS时不同的系统有不一样的用户名，这点需要自己认真辨别
+   * 等等
+
+   > 这里说一个小贴士，使用‘ssh -v -i ~/.ssh/KepPair.pem root@114.23.4.125’可以帮助看一下哪里出错了，比如我从中判断出了我的密钥文件没有问题，但是在检测用户名后进入Authentication阶段就一直显示验证失败，由此可以判断用户名也许有问题。
+
+3. 如果需要长期登陆远程服务区，可以使用ssh-add把pem文件添加，下次直接登录
+
+   `ssh-add -K KeyPair.pem`
+
+   `ssh linux@192.168.2.100`
+
+   如果使用`ssh-add KeyPair.pem`的话，重新进入终端的时候并不能直接登录，因为此命令是将文件存入了缓存区。
+
+
+
+### 介绍Cyberduck
+
+在Windows下有Winscp作为ssh的开源图形化SFTP客户端，主要功能是在本地和远程计算机之间安全复制文件，但是不支持mac使用，我用的cyberduck作为替代。
+
+![Screen Shot 2018-04-25 at 9.16.41 PM.png](https://i.loli.net/2018/04/25/5ae0979978636.png)
+
+点击“新建连接”。
+
+![Screen Shot 2018-04-25 at 9.16.41 PM.png](https://i.loli.net/2018/04/25/5ae0979973cba.png)
+
+选择SFTP协议，服务器填写IP地址，用户名和密码自己应该有，SSH private key就在下拉菜单中选择我们上面讲到的pem文件。
+
+填写完成后点击“连接”，成功后就列出了服务器上的文件夹。
+
+参考教程https://jingyan.baidu.com/article/4f34706e19c95ae387b56df9.html。
